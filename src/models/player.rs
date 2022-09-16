@@ -6,7 +6,7 @@ const DEFAULT: &str = "Unknown";
 
 #[derive(serde::Serialize)]
 pub struct Player {
-    identity: String,
+    pub identity: String,
     track: String,
     artists: Vec<String>,
     album_art: String,
@@ -14,7 +14,7 @@ pub struct Player {
     pos: Duration,
     len: Duration,
     can_play: bool,
-    is_playing: bool,
+    pub is_playing: bool,
     can_go_next: bool,
     can_go_prev: bool,
     bus_name: String,

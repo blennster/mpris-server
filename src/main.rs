@@ -1,5 +1,5 @@
 use actix_cors::Cors;
-use actix_web::{App, HttpServer};
+use actix_web::{web, App, HttpServer};
 
 mod models;
 mod routes;
@@ -13,7 +13,13 @@ async fn main() -> std::io::Result<()> {
             .allowed_methods(vec!["GET", "POST", "PUT"])
             .allow_any_header();
 
-        App::new().wrap(cors).service(routes::mpris::players)
+        App::new().wrap(cors).service(
+            web::scope("/mpris")
+                .service(routes::mpris::get_players)
+                .service(routes::mpris::get_player)
+                .service(routes::mpris::play)
+                .service(routes::mpris::pause),
+        )
     })
     .bind(("0.0.0.0", 8080))?
     .run()

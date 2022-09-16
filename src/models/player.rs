@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use mpris;
 
 const DEFAULT: &str = "Unknown";

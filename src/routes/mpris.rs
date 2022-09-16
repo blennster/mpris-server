@@ -14,16 +14,16 @@ fn get_active_player<'a>() -> Option<mpris::Player<'a>> {
     }
 }
 
-fn get_player_by_id<'a>(idx: usize) -> Option<mpris::Player<'a>> {
-    let mut players = PlayerFinder::new()
+fn get_player_by_id<'a>(identity: &String) -> Option<mpris::Player<'a>> {
+    let players = PlayerFinder::new()
         .expect("no d-bus connection")
         .find_all()
         .expect("no players found");
-    if idx < players.len() {
-        Some(players.swap_remove(idx))
-    } else {
-        None
-    }
+
+    players
+        .into_iter()
+        .filter(|p| p.identity().to_lowercase() == identity.to_lowercase())
+        .next()
 }
 
 #[get("/current")]
@@ -31,31 +31,32 @@ pub async fn get_current() -> impl Responder {
     let p = get_active_player();
 
     match p {
-        Some(p) => HttpResponse::Ok().json(Player::from_mpris(p)),
+        Some(p) => HttpResponse::Ok().json(Player::from_mpris(&p)),
         None => HttpResponse::NotFound().finish(),
     }
 }
 
 #[get("/")]
 pub async fn get_players() -> impl Responder {
-    let players = PlayerFinder::new().unwrap().find_all().unwrap();
+    let ps = PlayerFinder::new().unwrap().find_all().unwrap();
+    let players: Vec<Player> = ps.iter().map(|p| Player::from_mpris(p)).collect();
 
-    HttpResponse::Ok().json(players.len())
+    HttpResponse::Ok().json(players)
 }
 
 #[get("/{id}")]
-pub async fn get_player(id: web::Path<usize>) -> impl Responder {
-    let p = get_player_by_id(*id);
+pub async fn get_player(id: web::Path<String>) -> impl Responder {
+    let p = get_player_by_id(&id);
 
     match p {
-        Some(p) => HttpResponse::Ok().json(Player::from_mpris(p)),
+        Some(p) => HttpResponse::Ok().json(Player::from_mpris(&p)),
         None => HttpResponse::NotFound().finish(),
     }
 }
 
 #[post("/{id}/play")]
-pub async fn play(id: web::Path<usize>) -> impl Responder {
-    let p = get_player_by_id(*id);
+pub async fn play(id: web::Path<String>) -> impl Responder {
+    let p = get_player_by_id(&id);
 
     match p {
         Some(p) => {
@@ -67,8 +68,8 @@ pub async fn play(id: web::Path<usize>) -> impl Responder {
 }
 
 #[post("/{id}/pause")]
-pub async fn pause(id: web::Path<usize>) -> impl Responder {
-    let p = get_player_by_id(*id);
+pub async fn pause(id: web::Path<String>) -> impl Responder {
+    let p = get_player_by_id(&id);
 
     match p {
         Some(p) => {
@@ -80,8 +81,8 @@ pub async fn pause(id: web::Path<usize>) -> impl Responder {
 }
 
 #[post("/{id}/next")]
-pub async fn next(id: web::Path<usize>) -> impl Responder {
-    let p = get_player_by_id(*id);
+pub async fn next(id: web::Path<String>) -> impl Responder {
+    let p = get_player_by_id(&id);
 
     match p {
         Some(p) => {
@@ -93,8 +94,8 @@ pub async fn next(id: web::Path<usize>) -> impl Responder {
 }
 
 #[post("/{id}/prev")]
-pub async fn prev(id: web::Path<usize>) -> impl Responder {
-    let p = get_player_by_id(*id);
+pub async fn prev(id: web::Path<String>) -> impl Responder {
+    let p = get_player_by_id(&id);
 
     match p {
         Some(p) => {

@@ -31,8 +31,10 @@ async fn main() -> std::io::Result<()> {
                 .service(routes::mpris::play)
                 .service(routes::mpris::pause)
                 .service(routes::mpris::next)
-                .service(routes::mpris::prev),
+                .service(routes::mpris::prev)
+                .service(routes::websocket::index),
         )
+        //.route("/ws/{id}", web::get().to(routes::websocket::index))
     })
     .bind(("0.0.0.0", 8080))?
     .run()

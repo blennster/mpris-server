@@ -10,7 +10,7 @@ fn get_all_players<'a>() -> Vec<mpris::Player<'a>> {
         .expect("no players found")
 }
 
-fn get_active_player() -> Option<Player> {
+pub fn get_active_player() -> Option<Player> {
     let players = get_all_players();
     players
         .into_iter()
@@ -18,7 +18,7 @@ fn get_active_player() -> Option<Player> {
         .find(|p| p.is_playing)
 }
 
-fn get_player_by_id<'a>(identity: &String) -> Option<mpris::Player<'a>> {
+pub fn get_player_by_id<'a>(identity: &String) -> Option<mpris::Player<'a>> {
     let players = get_all_players();
 
     players

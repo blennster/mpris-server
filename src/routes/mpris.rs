@@ -13,8 +13,8 @@ fn get_all_players<'a>() -> Vec<mpris::Player<'a>> {
 pub fn get_active_player() -> Option<Player> {
     let players = get_all_players();
     players
-        .into_iter()
-        .map(|p| Player::from_mpris(&p))
+        .iter()
+        .map(|p| Player::from_mpris(p))
         .find(|p| p.is_playing)
 }
 

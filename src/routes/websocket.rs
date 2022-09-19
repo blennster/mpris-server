@@ -4,6 +4,7 @@ use actix::{Actor, AsyncContext, SpawnHandle, StreamHandler};
 use actix_web::{get, web, Error, HttpRequest, HttpResponse};
 use actix_web_actors::ws;
 
+use crate::models::player::Player;
 use crate::routes;
 
 struct MyWs {
@@ -26,9 +27,7 @@ impl MyWs {
             return;
         }
         self.handle = Some(ctx.run_interval(Duration::from_secs(1), |act, ctx| {
-            let json =
-                serde_json::to_string(&crate::models::player::Player::from_mpris(&act.player))
-                    .unwrap();
+            let json = serde_json::to_string(&Player::from_mpris(&act.player)).unwrap();
             ctx.text(json);
         }));
     }
